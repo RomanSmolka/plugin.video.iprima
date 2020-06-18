@@ -1,0 +1,147 @@
+# -*- coding: utf-8 -*-
+
+import xbmcgui
+import xbmcplugin
+import xbmcaddon
+import json
+import requests
+import routing
+
+import lib.helpers as helpers
+import lib.lookups as lookups
+
+plugin = routing.Plugin()
+
+def run():
+	plugin.run()
+
+""" 
+	ROOT MENU
+"""
+@plugin.route('/')
+def root():
+	for item in lookups.menu_items:
+		li = xbmcgui.ListItem(item['title'])
+		url = plugin.url_for_path( '/section/{0}/'.format(item['resource']) )
+		xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
+
+	xbmcplugin.endOfDirectory(plugin.handle)
+
+""" 
+	SECTION LISTING
+"""
+@plugin.route('/section/<resource>/')
+def section(resource):
+	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
+	items = helpers.requestResource(resource, page=page)
+
+	renderItems(items)
+	
+	if len(items) == lookups.shared['pagination']:
+		next_li = xbmcgui.ListItem('Další strana')
+		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/section/{0}/?page={1}'.format(resource, page+1) ), next_li, isFolder=True)
+
+	xbmcplugin.endOfDirectory(plugin.handle)
+
+""" 
+	PROGRAM LISTING
+"""
+@plugin.route('/program/<nid>/')
+def program(nid):
+	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
+	programDetail = helpers.requestResource( 'program_by_id', page=page, postOptions={'nid': nid} )
+
+	if page == 0:
+		for season in programDetail['seasons'] or []:
+			li = xbmcgui.ListItem(season)
+			url = plugin.url_for_path( '/sublisting/{0}/{1}/'.format(nid, season) )
+			xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
+
+		bonuses = helpers.requestResource( 'bonus', postOptions={'programId': nid, 'count': 1} )
+		if len(bonuses) > 0:
+			li = xbmcgui.ListItem('Bonusy')
+			url = plugin.url_for_path( '/sublisting/{0}/bonus/'.format(nid) )
+			xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
+
+	renderItems(programDetail['episodes'])
+
+	if len(programDetail['episodes']) == lookups.shared['pagination']:
+		next_li = xbmcgui.ListItem('Další strana')
+		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/program/{0}/?page={1}'.format(nid, page+1) ), next_li, isFolder=True)
+
+	xbmcplugin.endOfDirectory(plugin.handle)
+
+""" 
+	SUBPROGRAM LISTING
+"""
+@plugin.route('/sublisting/<programId>/<season>/')
+def sublisting(programId, season):
+	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
+	
+	if season == 'bonus':
+		items = helpers.requestResource( 'bonus', page=page, postOptions={'programId': programId} )
+	else:
+		items = helpers.requestResource( 'season', page=page, postOptions={'programId': programId, 'season': season} )
+
+	renderItems(items)
+	
+	if len(items) == lookups.shared['pagination']:
+		next_li = xbmcgui.ListItem('Další strana')
+		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/sublisting/{0}/?season={1}&page={2}'.format(programId, season, page+1) ), next_li, isFolder=True)
+
+	xbmcplugin.endOfDirectory(plugin.handle)
+
+""" 
+	ITEMS RENDERING
+"""
+def renderItems(items):
+	for item in items:
+		if 'admittanceType' in item and item['admittanceType'] != 'free':
+			continue
+
+		label = item['name'] if 'name' in item else item['title']
+		itemType = item['type'] if 'type' in item else 'video'
+		genres = item['genres'] if 'genres' in item else ''
+		teaser = item['teaser'] if 'teaser' in item else ''
+
+		isPlayable = helpers.isPlayable(itemType)
+
+		li = xbmcgui.ListItem(label)
+
+		if isPlayable:
+			url = plugin.url_for_path( '/play/{0}'.format(item['playId']) )
+			li.setProperty('IsPlayable', 'true')
+		else:
+			url = plugin.url_for_path( '/program/{0}/'.format(item['nid']) )
+
+		infoLabels = {
+			'genre': ', '.join( genres or '' ),
+			'plot': teaser or ''
+		}
+
+		if 'length' in item:
+			infoLabels['duration'] = item['length']
+		if 'premiereDate' in item:
+			infoLabels['premiered'] = item['premiereDate'].split('T')[0]
+		if 'thumbnailData' in  item and item['thumbnailData']:
+			li.setArt({ 'thumb': item['thumbnailData']['url'] })
+		if 'logo' in  item:
+			li.setArt({ 'thumb': item['logo'] })
+
+		li.setInfo( type='video', infoLabels=infoLabels )
+		xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=not isPlayable)
+
+""" 
+	PLAY ACTION
+"""
+@plugin.route('/play/<videoId>')
+def play(videoId):
+	videoDetail = helpers.requestResource('play', replace={'id': videoId})
+	try:
+		url = videoDetail['streamInfos'][0]['url']
+	except:
+		helpers.displayMessage('Nenalezen žádný stream pro video', 'ERROR')
+		return
+	li = xbmcgui.ListItem(path=url)
+
+	xbmcplugin.setResolvedUrl(plugin.handle, True, li)

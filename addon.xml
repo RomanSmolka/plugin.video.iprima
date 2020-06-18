@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.iprima" version="1.0.0" name="iPrima.cz" provider-name="Roman Smolka">
+<requires>
+	<import addon="xbmc.python" version="2.26.0"/>
+	<import addon="script.module.routing" version="0.2.3"/>
+	<import addon="script.module.requests" version="2.22.0"/>
+</requires>
+<extension point="xbmc.python.pluginsource" library="main.py">
+	<provides>video</provides>
+</extension>
+<extension point="xbmc.addon.metadata">
+	<summary>iPrima.cz</summary>
+	<description>Doplněk pro zobrazování obsahu z archivu iPrima. [CR]Autor nedistribuuje žádný obsah zobrazený tímto doplňkem. Uživatelé se zájmem o přehrávání video obsahu by měli mít aktivní předplatné na iPrima.cz</description>
+	<platform>all</platform>
+	<assets>
+		<icon>resources/icon.png</icon>
+	</assets>
+</extension>
+</addon>
