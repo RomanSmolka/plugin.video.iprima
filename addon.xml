@@ -12,6 +12,7 @@
 	<summary>iPrima.cz</summary>
 	<description>Doplněk pro zobrazování obsahu z archivu iPrima. [CR]Autor nedistribuuje žádný obsah zobrazený tímto doplňkem. Uživatelé se zájmem o přehrávání video obsahu by měli mít aktivní předplatné na iPrima.cz</description>
 	<platform>all</platform>
+	<source>https://github.com/RomanSmolka/plugin.video.iprima.git</source>
 	<assets>
 		<icon>resources/icon.png</icon>
 	</assets>
