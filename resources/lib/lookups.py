@@ -3,6 +3,7 @@
 shared = {
 	'graphql_base': 'https://api.iprima.cz/graphql',
 	'play_api_base': 'https://api.play-backend.iprima.cz/api/v1',
+	'plugin_path': 'plugin://plugin.video.iprima',
 	'pagination': 25
 }
 

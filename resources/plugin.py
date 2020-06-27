@@ -6,9 +6,13 @@ import xbmcaddon
 import json
 import requests
 import routing
+import sys
 
 import lib.helpers as helpers
 import lib.lookups as lookups
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 plugin = routing.Plugin()
 
@@ -54,7 +58,7 @@ def program(nid):
 	if page == 0:
 		for season in programDetail['seasons'] or []:
 			li = xbmcgui.ListItem(season)
-			url = plugin.url_for_path( '/sublisting/{0}/{1}/'.format(nid, season) )
+			url = lookups.shared['plugin_path'] + '/sublisting/{0}/{1}/'.format(nid, season.replace('/', '%2F'))
 			xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
 
 		bonuses = helpers.requestResource( 'bonus', postOptions={'programId': nid, 'count': 1} )
@@ -81,7 +85,7 @@ def sublisting(programId, season):
 	if season == 'bonus':
 		items = helpers.requestResource( 'bonus', page=page, postOptions={'programId': programId} )
 	else:
-		items = helpers.requestResource( 'season', page=page, postOptions={'programId': programId, 'season': season} )
+		items = helpers.requestResource( 'season', page=page, postOptions={'programId': programId, 'season': season.replace('%2F', '/')} )
 
 	renderItems(items)
 	
