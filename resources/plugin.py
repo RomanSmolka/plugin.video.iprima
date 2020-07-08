@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import xbmc
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
@@ -17,7 +18,9 @@ sys.setdefaultencoding('utf8')
 plugin = routing.Plugin()
 
 def run():
+	lookups.shared['pagination'] = lookups.settings['pagination_options'][int(xbmcplugin.getSetting(plugin.handle, 'pagination'))]
 	plugin.run()
+
 
 """ 
 	ROOT MENU
@@ -25,11 +28,18 @@ def run():
 @plugin.route('/')
 def root():
 	for item in lookups.menu_items:
-		li = xbmcgui.ListItem(item['title'])
+		li = xbmcgui.ListItem(item['title'], iconImage=item['icon'])
 		url = plugin.url_for_path( '/section/{0}/'.format(item['resource']) )
 		xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
 
+	xbmcplugin.addDirectoryItem(plugin.handle, 
+		plugin.url_for_path('/action/settings'),
+		xbmcgui.ListItem('Nastavení', iconImage='DefaultAddonService.png'), 
+		isFolder=True
+	)
+
 	xbmcplugin.endOfDirectory(plugin.handle)
+
 
 """ 
 	SECTION LISTING
@@ -42,10 +52,14 @@ def section(resource):
 	renderItems(items)
 	
 	if len(items) == lookups.shared['pagination']:
-		next_li = xbmcgui.ListItem('Další strana')
-		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/section/{0}/?page={1}'.format(resource, page+1) ), next_li, isFolder=True)
+		xbmcplugin.addDirectoryItem(plugin.handle, 
+			plugin.url_for_path( '/section/{0}/?page={1}'.format(resource, page+1) ),
+			xbmcgui.ListItem('Další strana'), 
+			isFolder=True
+		)
 
 	xbmcplugin.endOfDirectory(plugin.handle)
+
 
 """ 
 	PROGRAM LISTING
@@ -70,10 +84,14 @@ def program(nid):
 	renderItems(programDetail['episodes'])
 
 	if len(programDetail['episodes']) == lookups.shared['pagination']:
-		next_li = xbmcgui.ListItem('Další strana')
-		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/program/{0}/?page={1}'.format(nid, page+1) ), next_li, isFolder=True)
+		xbmcplugin.addDirectoryItem(plugin.handle, 
+			plugin.url_for_path( '/program/{0}/?page={1}'.format(nid, page+1) ),
+			xbmcgui.ListItem('Další strana'),
+			isFolder=True
+		)
 
 	xbmcplugin.endOfDirectory(plugin.handle)
+
 
 """ 
 	SUBPROGRAM LISTING
@@ -90,10 +108,14 @@ def sublisting(programId, season):
 	renderItems(items)
 	
 	if len(items) == lookups.shared['pagination']:
-		next_li = xbmcgui.ListItem('Další strana')
-		xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for_path( '/sublisting/{0}/?season={1}&page={2}'.format(programId, season, page+1) ), next_li, isFolder=True)
+		xbmcplugin.addDirectoryItem(plugin.handle, 
+			plugin.url_for_path( '/sublisting/{0}/?season={1}&page={2}'.format(programId, season, page+1) ),
+			xbmcgui.ListItem('Další strana'),
+			isFolder=True
+		)
 
 	xbmcplugin.endOfDirectory(plugin.handle)
+
 
 """ 
 	ITEMS RENDERING
@@ -113,7 +135,7 @@ def renderItems(items):
 		li = xbmcgui.ListItem(label)
 
 		if isPlayable:
-			url = plugin.url_for_path( '/play/{0}'.format(item['playId']) )
+			url = plugin.url_for_path( '/action/play/?videoId={0}'.format(item['playId']) )
 			li.setProperty('IsPlayable', 'true')
 		else:
 			url = plugin.url_for_path( '/program/{0}/'.format(item['nid']) )
@@ -135,17 +157,24 @@ def renderItems(items):
 		li.setInfo( type='video', infoLabels=infoLabels )
 		xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=not isPlayable)
 
-""" 
-	PLAY ACTION
-"""
-@plugin.route('/play/<videoId>')
-def play(videoId):
-	videoDetail = helpers.requestResource('play', replace={'id': videoId})
-	try:
-		url = videoDetail['streamInfos'][0]['url']
-	except:
-		helpers.displayMessage('Nenalezen žádný stream pro video', 'ERROR')
-		return
-	li = xbmcgui.ListItem(path=url)
 
-	xbmcplugin.setResolvedUrl(plugin.handle, True, li)
+""" 
+	ACTIONS
+"""
+@plugin.route('/action/<name>')
+def action(name):
+
+	if name == 'settings':
+		xbmcaddon.Addon().openSettings()
+
+	if name == 'play':
+		videoId = plugin.args['videoId'][0]
+		videoDetail = helpers.requestResource('play', replace={'id': videoId})
+		try:
+			url = videoDetail['streamInfos'][0]['url']
+		except:
+			helpers.displayMessage('Nenalezen žádný stream pro video', 'ERROR')
+			return
+		li = xbmcgui.ListItem(path=url)
+
+		xbmcplugin.setResolvedUrl(plugin.handle, True, li)

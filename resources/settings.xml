@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+	<category label="Obecné">
+		<setting id="pagination" type="enum" label="Položek na stránku" values="25|50|100|150" default="0"/>
+	</category>
+</settings>

@@ -4,25 +4,33 @@ shared = {
 	'graphql_base': 'https://api.iprima.cz/graphql',
 	'play_api_base': 'https://api.play-backend.iprima.cz/api/v1',
 	'plugin_path': 'plugin://plugin.video.iprima',
-	'pagination': 25
+	'pagination': 25, # default value, can be overriden in addon settings
+}
+
+settings = {
+	'pagination_options': [25, 50, 100, 150]
 }
 
 menu_items = [
 	{
 		'title': 'Živé vysílání',
-		'resource': 'live'
+		'resource': 'live',
+		'icon': 'DefaultAddonPVRClient.png'
 	},
 	{
 		'title': 'Pořady a seriály',
-		'resource': 'programs'
-	},
-	{
-		'title': 'Filmy pro děti',
-		'resource': 'kids_movies'
+		'resource': 'programs',
+		'icon': 'DefaultTVShows.png'
 	},
 	{
 		'title': 'Seriály pro děti',
-		'resource': 'kids_series'
+		'resource': 'kids_series',
+		'icon': 'DefaultTVShows.png'
+	},
+	{
+		'title': 'Filmy pro děti',
+		'resource': 'kids_movies',
+		'icon': 'DefaultMovies.png'
 	}
 ]
 
