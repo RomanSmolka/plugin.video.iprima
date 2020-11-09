@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import xbmc
+import xbmcgui
 import requests
 import lookups
 import json
-import xbmcgui
+import sys
 from string import Template
+
+def log(msg, level=1):
+	xbmc.log('iPrima: ' + msg, level)
 
 def getResourceUrl(resource, replacements):
 	url = lookups.resources[resource]['path']
@@ -46,6 +50,8 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}):
 	if method == 'POST':
 		data = getResourcePostData(resource, options).encode('utf-8')
 		contentPath = getResourceContentPath(resource)
+
+		log('Requesting: %s; with data: %s' % (url, data))
 		request = requests.post(
 			url,
 			data=data,
@@ -54,6 +60,7 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}):
 		if request.status_code == requests.codes.ok:
 			return getJSONPath(request.json(), contentPath)
 	else:
+		log('Requesting: ' + url)
 		request = requests.get(
 			url,
 			timeout=20
