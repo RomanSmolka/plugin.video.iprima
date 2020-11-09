@@ -45,7 +45,23 @@ resources = {
 		'path': shared['graphql_base'],
 		'method': 'POST',
 		'content_path': ['data', 'programList'],
-		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: title_asc) { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}'
+		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: title_asc) { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}',
+		'subsections': [
+			{'title': 'Nejsledovanější', 'resource': 'programs_sort_top'},
+			{'title': 'Naposledy odvysílané', 'resource': 'programs_sort_broadcast_date'}
+		]
+	},
+	'programs_sort_top': {
+		'path': shared['graphql_base'],
+		'method': 'POST',
+		'content_path': ['data', 'programList'],
+		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: top) { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}'
+	},
+	'programs_sort_broadcast_date': {
+		'path': shared['graphql_base'],
+		'method': 'POST',
+		'content_path': ['data', 'programList'],
+		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: broadcast_date) { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}'
 	},
 	'program_by_id': {
 		'path': shared['graphql_base'],

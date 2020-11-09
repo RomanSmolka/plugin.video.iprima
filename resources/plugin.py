@@ -49,6 +49,14 @@ def section(resource):
 	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
 	items = helpers.requestResource(resource, page=page)
 
+	if 'subsections' in lookups.resources[resource]:
+		for item in lookups.resources[resource]['subsections']:
+			xbmcplugin.addDirectoryItem(plugin.handle, 
+				plugin.url_for_path( '/section/{0}/'.format(item['resource']) ),
+				xbmcgui.ListItem(item['title']), 
+				isFolder=True
+			)
+
 	renderItems(items)
 	
 	if len(items) == lookups.shared['pagination']:
