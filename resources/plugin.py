@@ -109,7 +109,7 @@ def sublisting(programId, season):
 	
 	if len(items) == lookups.shared['pagination']:
 		xbmcplugin.addDirectoryItem(plugin.handle, 
-			plugin.url_for_path( '/sublisting/{0}/?season={1}&page={2}'.format(programId, season, page+1) ),
+			plugin.url_for_path( '/sublisting/{0}/{1}?page={2}'.format(programId, season, page+1) ),
 			xbmcgui.ListItem('Další strana'),
 			isFolder=True
 		)
