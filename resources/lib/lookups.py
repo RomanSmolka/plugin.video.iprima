@@ -51,7 +51,7 @@ resources = {
 		'path': shared['graphql_base'],
 		'method': 'POST',
 		'content_path': ['data', 'programById'],
-		'post_data': '{ "query": "{ programById(id: $nid) { title type genres teaser seasons episodes(paging: {count: $count, offset: $offset}) { title type episodeTitle teaser genres premiereDate length thumbnailData(size: hbbtv_tile_m) {url} playId } }}"}'
+		'post_data': '{ "query": "{ programById(id: $nid) { title type genres teaser seasons episodes(paging: {count: $count, offset: $offset}) { title type admittanceType episodeTitle teaser genres premiereDate length thumbnailData(size: hbbtv_tile_m) {url} playId } }}"}'
 	},
 	'kids_movies': {
 		'path': shared['graphql_base'],
@@ -91,3 +91,5 @@ item_types = {
 		'playable': True
 	}
 }
+
+free_admittance_types = ['free', 'basic']

@@ -122,7 +122,7 @@ def sublisting(programId, season):
 """
 def renderItems(items):
 	for item in items:
-		if 'admittanceType' in item and item['admittanceType'] != 'free':
+		if 'admittanceType' in item and item['admittanceType'] not in lookups.free_admittance_types:
 			continue
 
 		label = item['name'] if 'name' in item else item['title']
