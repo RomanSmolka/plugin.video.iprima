@@ -108,4 +108,4 @@ item_types = {
 	}
 }
 
-free_admittance_types = ['free', 'basic']
+free_admittance_types = ['free', 'basic', 'registered']

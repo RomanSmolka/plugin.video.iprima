@@ -11,15 +11,24 @@ import sys
 
 import lib.helpers as helpers
 import lib.lookups as lookups
+import lib.auth as auth
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 plugin = routing.Plugin()
+addon = xbmcaddon.Addon()
 
 def run():
 	lookups.shared['pagination'] = lookups.settings['pagination_options'][int(xbmcplugin.getSetting(plugin.handle, 'pagination'))]
-	plugin.run()
+
+	credentialsAvailable = helpers.performCredentialCheck()
+
+	if credentialsAvailable:
+		plugin.run()
+	else:
+		xbmc.executebuiltin("Action(Back,%s)" % xbmcgui.getCurrentWindowId())
+		sys.exit(1)
 
 
 """ 
@@ -49,7 +58,7 @@ def section(resource):
 	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
 	items = helpers.requestResource(resource, page=page)
 
-	if 'subsections' in lookups.resources[resource]:
+	if 'subsections' in lookups.resources[resource] and page == 0:
 		for item in lookups.resources[resource]['subsections']:
 			xbmcplugin.addDirectoryItem(plugin.handle, 
 				plugin.url_for_path( '/section/{0}/'.format(item['resource']) ),
@@ -173,7 +182,7 @@ def renderItems(items):
 def action(name):
 
 	if name == 'settings':
-		xbmcaddon.Addon().openSettings()
+		addon.openSettings()
 
 	if name == 'play':
 		videoId = plugin.args['videoId'][0]
