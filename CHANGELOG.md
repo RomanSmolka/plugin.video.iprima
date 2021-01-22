@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.1] 2020-01-22
+
+### Změny
+- Vylepšené debug logování
+
 ## [1.3.0] 2020-01-21
 
 ### Změny
