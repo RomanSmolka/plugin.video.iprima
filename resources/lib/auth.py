@@ -22,6 +22,7 @@ def login(email, password):
 	csrf_token = ''
 	if r_csrf:
 		csrf_token = r_csrf.group(1)
+		helpers.log('CSRF: ' + csrf_token)
 	else:
 		helpers.displayMessage('Nepodařilo se získat CSRF token', 'ERROR')
 		sys.exit(1)
@@ -32,6 +33,7 @@ def login(email, password):
 		'_password': password,
 		'_csrf_token': csrf_token
 	})
+	helpers.log('Auth check URL: ' + do_login.url)
 
 	# Acquire authorization code from login result
 	parsed_auth_url = urlparse(do_login.url)
@@ -49,6 +51,7 @@ def login(email, password):
 		'code': auth_code,
 		'redirect_uri': 'https://auth.iprima.cz/sso/auth_check.html'
 	})
+	helpers.log('Get token response: ' + get_token.content)
 	if get_token.ok:
 		responseJson = get_token.json()
 		return responseJson['access_token']

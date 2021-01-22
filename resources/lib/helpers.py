@@ -98,6 +98,7 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}, retry
 		'X-OTT-Access-Token': token
 	}
 
+	log('Using auth token: ' + token)
 	if method == 'POST':
 		data = getResourcePostData(resource, options).encode('utf-8')
 		contentPath = getResourceContentPath(resource)
@@ -105,9 +106,11 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}, retry
 	else:
 		request = getUrl(url, common_headers)
 
+	log('Response status: ' + str(request.status_code))
 	if request.ok:
 		return getJSONPath(request.json(), contentPath) if method == 'POST' else request.json()
 	elif request.status_code in {401, 403}:
+		log('UNAUTHORIZED: ' + request.content)
 		if retrying: 
 			displayMessage('Chyba autorizace', 'ERROR')
 			sys.exit(1)
