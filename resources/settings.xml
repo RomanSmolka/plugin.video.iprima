@@ -5,6 +5,9 @@
 		<setting label="Účet iPrima" type="lsep"/>
 		<setting id="username" type="text" label="E-mail" default=""/>
 		<setting id="password" type="text" label="Heslo" option="hidden" default=""/>
+
 		<setting id="accessToken" type="text" label="Access token" default="" visible="false"/>
+		<setting id="deviceId" type="text" label="Device ID" default="" visible="false"/>
+		<setting id="userId" type="text" label="User ID" default="" visible="false"/>
 	</category>
 </settings>

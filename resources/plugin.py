@@ -22,7 +22,7 @@ addon = xbmcaddon.Addon()
 def run():
 	lookups.shared['pagination'] = lookups.settings['pagination_options'][int(xbmcplugin.getSetting(plugin.handle, 'pagination'))]
 
-	credentialsAvailable = helpers.performCredentialCheck()
+	credentialsAvailable = auth.performCredentialCheck()
 
 	if credentialsAvailable:
 		plugin.run()
