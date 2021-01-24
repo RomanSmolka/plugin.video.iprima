@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.2] 2020-01-24
+
+### Změny
+- Doplněk nově při komunikaci se serverem pracuje s Device ID a User ID (mělo by řešit problém s hláškou Chyba autorizace)
+
 ## [1.3.1] 2020-01-22
 
 ### Změny
