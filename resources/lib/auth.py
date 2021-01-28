@@ -2,7 +2,6 @@
 
 import re
 import requests
-import helpers
 import sys
 import time
 import datetime
@@ -62,7 +61,9 @@ def generateDeviceId():
 	return(device_id)
 
 def getDeviceId():
+	from . import helpers
 	device_id = xbmcplugin.getSetting(plugin.handle, 'deviceId')
+
 	if not device_id:
 		helpers.log('Generating new device id', 2)
 		device_id = generateDeviceId()
@@ -74,6 +75,8 @@ def getDeviceId():
 	return device_id
 
 def getAccessToken(refresh=False, device=None):
+	from . import helpers
+	
 	access_token = xbmcplugin.getSetting(plugin.handle, 'accessToken')
 	user_id = xbmcplugin.getSetting(plugin.handle, 'userId')
 
@@ -91,6 +94,7 @@ def getAccessToken(refresh=False, device=None):
 	return {'token': access_token, 'user_id': user_id}
 
 def login(email, password, device_id):
+	from . import helpers
 	s = requests.Session()
 
 	cookies = {
@@ -136,7 +140,7 @@ def login(email, password, device_id):
 		'code': auth_code,
 		'redirect_uri': 'https://auth.iprima.cz/sso/auth_check.html'
 	}, cookies=cookies)
-	helpers.log('Get token response: ' + get_token.content)
+	helpers.log('Get token response: ' + get_token.text)
 
 	if get_token.ok:
 		return get_token.json()

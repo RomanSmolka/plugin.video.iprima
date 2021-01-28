@@ -3,12 +3,11 @@
 import xbmc
 import xbmcgui
 import requests
-import lookups
-import auth
 import json
 import sys
 
 from string import Template
+from . import lookups, auth
 
 def log(msg, level=1):
 	xbmc.log('iPrima: ' + msg, level)
@@ -74,7 +73,7 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}, retry
 		return getJSONPath(request.json(), contentPath) if method == 'POST' else request.json()
 		
 	elif request.status_code in {401, 403}:
-		log('UNAUTHORIZED: ' + request.content)
+		log('UNAUTHORIZED: ' + request.text)
 		if retrying: 
 			displayMessage('Chyba autorizace', 'ERROR')
 			sys.exit(1)

@@ -9,12 +9,11 @@ import requests
 import routing
 import sys
 
-import lib.helpers as helpers
-import lib.lookups as lookups
-import lib.auth as auth
+from .lib import helpers, lookups, auth
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+if sys.version_info.major < 3:
+	reload(sys)
+	sys.setdefaultencoding('utf8')
 
 plugin = routing.Plugin()
 addon = xbmcaddon.Addon()
@@ -37,13 +36,18 @@ def run():
 @plugin.route('/')
 def root():
 	for item in lookups.menu_items:
-		li = xbmcgui.ListItem(item['title'], iconImage=item['icon'])
+		li = xbmcgui.ListItem(item['title'])
+		li.setArt( {'icon': item['icon']} )
 		url = plugin.url_for_path( '/section/{0}/'.format(item['resource']) )
+		
 		xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
+
+	settingsItem = xbmcgui.ListItem('Nastavení')
+	settingsItem.setArt( {'icon': 'DefaultAddonService.png'} )
 
 	xbmcplugin.addDirectoryItem(plugin.handle, 
 		plugin.url_for_path('/action/settings'),
-		xbmcgui.ListItem('Nastavení', iconImage='DefaultAddonService.png'), 
+		settingsItem,
 		isFolder=True
 	)
 
