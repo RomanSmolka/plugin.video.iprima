@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.3] 2020-01-28
+
+### Změny
+- Podpora pro Kodi 19 Matrix (pro starší verze vytvořena větev "leia")
+
+### Opravy
+- Opraven občasný problém při získávání nového access tokenu
+
 ## [1.3.2] 2020-01-24
 
 ### Změny
