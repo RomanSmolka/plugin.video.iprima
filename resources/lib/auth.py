@@ -76,7 +76,7 @@ def getDeviceId():
 
 def getAccessToken(refresh=False, device=None):
 	from . import helpers
-	
+
 	access_token = xbmcplugin.getSetting(plugin.handle, 'accessToken')
 	user_id = xbmcplugin.getSetting(plugin.handle, 'userId')
 
@@ -87,10 +87,12 @@ def getAccessToken(refresh=False, device=None):
 		device_id = device or getDeviceId()
 
 		authentication = login(username, password, device_id)
+		access_token = authentication['access_token']
+		user_id = authentication['user_uuid']
 
-		addon.setSetting(id='accessToken', value=authentication['access_token'])
-		addon.setSetting(id='userId', value=authentication['user_uuid'])
-	
+		addon.setSetting(id='accessToken', value=access_token)
+		addon.setSetting(id='userId', value=user_id)
+
 	return {'token': access_token, 'user_id': user_id}
 
 def login(email, password, device_id):
