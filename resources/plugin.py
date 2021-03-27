@@ -9,6 +9,7 @@ import requests
 import routing
 import sys
 
+from urllib.parse import quote, unquote
 from .lib import helpers, lookups, auth
 
 if sys.version_info.major < 3:
@@ -93,7 +94,7 @@ def program(nid):
 	if page == 0:
 		for season in programDetail['seasons'] or []:
 			li = xbmcgui.ListItem(season)
-			url = lookups.shared['plugin_path'] + '/sublisting/{0}/{1}/'.format(nid, season.replace('/', '%2F'))
+			url = lookups.shared['plugin_path'] + '/sublisting/{0}/{1}/'.format(nid, quote(season, safe=''))
 			xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
 
 		bonuses = helpers.requestResource( 'bonus', postOptions={'programId': nid, 'count': 1} )
@@ -124,7 +125,7 @@ def sublisting(programId, season):
 	if season == 'bonus':
 		items = helpers.requestResource( 'bonus', page=page, postOptions={'programId': programId} )
 	else:
-		items = helpers.requestResource( 'season', page=page, postOptions={'programId': programId, 'season': season.replace('%2F', '/')} )
+		items = helpers.requestResource( 'season', page=page, postOptions={'programId': programId, 'season': unquote(season)} )
 
 	renderItems(items)
 	
