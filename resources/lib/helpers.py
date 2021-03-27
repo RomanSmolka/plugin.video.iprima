@@ -52,7 +52,8 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}, retry
 	common_headers = {
 		'Authorization': 'Bearer ' + authorization['token'],
 		'x-prima-access-token': authorization['token'],
-		'X-OTT-Access-Token': authorization['token']
+		'X-OTT-Access-Token': authorization['token'],
+		'Content-Type': 'application/json'
 	}
 
 	cookies = {
