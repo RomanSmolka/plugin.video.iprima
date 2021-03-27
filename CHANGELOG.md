@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.4] 2020-03-28
+
+### Opravy
+- Opraveny hlavičky požadavků na server
+
 ## [1.3.3] 2020-01-28
 
 ### Změny
