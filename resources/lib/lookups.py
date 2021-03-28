@@ -73,13 +73,13 @@ resources = {
 		'path': shared['graphql_base'],
 		'method': 'POST',
 		'content_path': ['data', 'strip', 'content'],
-		'post_data': '{ "query": "{ strip( id: \\"mobile-children-detail\\", paging: { count: $count, offset: $offset } sort: title_asc params: { facetFilters: { type: [video] } } ) { title content { title type teaser genres premiereDate admittanceType thumbnailData(size: hbbtv_tile_m) {url} playId } } }"}'
+		'post_data': '{ "query": "{ strip( id: \\"mobile-children-detail\\", paging: { count: $count, offset: $offset } sort: title_asc params: { facetFilters: { type: [video] } } ) { title content { ... on VideoNode { title type teaser genres premiereDate admittanceType thumbnailData(size: hbbtv_tile_m) {url} playId } } } }"}'
 	},
 	'kids_series': {
 		'path': shared['graphql_base'],
 		'method': 'POST',
 		'content_path': ['data', 'strip', 'content'],
-		'post_data': '{ "query": "{ strip( id: \\"mobile-children-detail\\", paging: { count: $count, offset: $offset } sort: title_asc params: { facetFilters: { type: [program] } } ) { title content { title type teaser genres seasons availableEpisodesCount thumbnailData(size: hbbtv_tile_m) {url} nid } } }"}'
+		'post_data': '{ "query": "{ strip( id: \\"mobile-children-detail\\", paging: { count: $count, offset: $offset } sort: title_asc params: { facetFilters: { type: [program] } } ) { title content { ... on ProgramNode { title type teaser genres seasons availableEpisodesCount thumbnailData(size: hbbtv_tile_m) {url} nid } } } }"}'
 	},
 	'season': {
 		'path': shared['graphql_base'],
