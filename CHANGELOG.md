@@ -1,6 +1,11 @@
 # Changelog
 
-## [1.3.4] 2020-03-28
+## [1.3.5] 2020-03-28
+
+### Opravy
+- Opraveny sekce Seriály pro děti a Filmy pro děti
+
+## [1.3.4] 2020-03-27
 
 ### Opravy
 - Opraveny hlavičky požadavků na server
