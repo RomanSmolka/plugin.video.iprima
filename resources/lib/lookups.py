@@ -28,6 +28,11 @@ menu_items = [
 		'icon': 'DefaultTVShows.png'
 	},
 	{
+		'title': 'Filmy',
+		'resource': 'movies',
+		'icon': 'DefaultMovies.png'
+	},
+	{
 		'title': 'Filmy pro děti',
 		'resource': 'kids_movies',
 		'icon': 'DefaultMovies.png'
@@ -45,7 +50,8 @@ resources = {
 		'path': shared['graphql_base'],
 		'method': 'POST',
 		'content_path': ['data', 'programList'],
-		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: title_asc) { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}',
+		'post_data': '{ "query": "{ programList(paging: {count: $count, offset: $offset}, hasEpisodes: true, sort: title_asc, fulltextTitle: \\"$search\\") { title type teaser thumbnailData(size: hbbtv_tile_m) {url} seasons availableEpisodesCount genres nid }}"}',
+		'searchable': True,
 		'subsections': [
 			{'title': 'Nejsledovanější', 'resource': 'programs_sort_top'},
 			{'title': 'Naposledy odvysílané', 'resource': 'programs_sort_broadcast_date'}
@@ -68,6 +74,29 @@ resources = {
 		'method': 'POST',
 		'content_path': ['data', 'programById'],
 		'post_data': '{ "query": "{ programById(id: $nid) { title type genres teaser seasons episodes(paging: {count: $count, offset: $offset}) { title type admittanceType episodeTitle teaser genres premiereDate length thumbnailData(size: hbbtv_tile_m) {url} playId } }}"}'
+	},
+	'movies': {
+		'path': shared['graphql_base'],
+		'method': 'POST',
+		'content_path': ['data', 'videoList'],
+		'post_data': '{ "query": "{ videoList(paging: {count: $count, offset: $offset}, sort: title_asc, fulltextTitle: \\"$search\\", videoCategory: movie, admittanceType: registered) { title type admittanceType genres teaser premiereDate year length thumbnailData(size: hbbtv_tile_m) { url } playId } }"}',
+		'searchable': True,
+		'subsections': [
+			{'title': 'Nejsledovanější', 'resource': 'movies_sort_top'},
+			{'title': 'Naposledy odvysílané', 'resource': 'movies_sort_broadcast_date'}
+		]
+	},
+	'movies_sort_top': {
+		'path': shared['graphql_base'],
+		'method': 'POST',
+		'content_path': ['data', 'videoList'],
+		'post_data': '{ "query": "{ videoList(paging: {count: $count, offset: $offset}, sort: top, videoCategory: movie, admittanceType: registered) { title type admittanceType genres teaser premiereDate year length thumbnailData(size: hbbtv_tile_m) { url } playId } }"}'
+	},
+	'movies_sort_broadcast_date': {
+		'path': shared['graphql_base'],
+		'method': 'POST',
+		'content_path': ['data', 'videoList'],
+		'post_data': '{ "query": "{ videoList(paging: {count: $count, offset: $offset}, sort: broadcast_date, videoCategory: movie, admittanceType: registered) { title type admittanceType genres teaser premiereDate year length thumbnailData(size: hbbtv_tile_m) { url } playId } }"}'
 	},
 	'kids_movies': {
 		'path': shared['graphql_base'],

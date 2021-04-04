@@ -9,7 +9,7 @@ import sys
 from string import Template
 from . import lookups, auth
 
-def log(msg, level=1):
+def log(msg, level=0):
 	xbmc.log('iPrima: ' + msg, level)
 
 def displayMessage(message, type='INFO'):
@@ -44,7 +44,8 @@ def requestResource(resource, count=0, page=0, replace={}, postOptions={}, retry
 	method = getResourceMethod(resource)
 	options = {
 		'count': str(count or lookups.shared['pagination']),
-		'offset': str(page * lookups.shared['pagination'])
+		'offset': str(page * lookups.shared['pagination']),
+		'search': ''
 	}
 	options.update(postOptions)
 

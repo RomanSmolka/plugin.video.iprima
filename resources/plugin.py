@@ -61,15 +61,24 @@ def root():
 @plugin.route('/section/<resource>/')
 def section(resource):
 	page = int(plugin.args['page'][0]) if 'page' in plugin.args else 0
-	items = helpers.requestResource(resource, page=page)
+	search = plugin.args['search'][0] if 'search' in plugin.args else ''
 
-	if 'subsections' in lookups.resources[resource] and page == 0:
-		for item in lookups.resources[resource]['subsections']:
-			xbmcplugin.addDirectoryItem(plugin.handle, 
-				plugin.url_for_path( '/section/{0}/'.format(item['resource']) ),
-				xbmcgui.ListItem(item['title']), 
-				isFolder=True
-			)
+	items = helpers.requestResource(resource, page=page, postOptions={'search': search})
+
+	if page == 0 and not search:
+		if 'searchable' in lookups.resources[resource]:
+			url = plugin.url_for_path( '/action/search/?origin={0}'.format(resource) )
+			li = xbmcgui.ListItem('Hledat')
+			li.setArt( {'icon': 'DefaultAddonsSearch.png'} )
+			xbmcplugin.addDirectoryItem(plugin.handle, url,	li, isFolder=True)
+
+		if 'subsections' in lookups.resources[resource]:
+			for item in lookups.resources[resource]['subsections']:
+				xbmcplugin.addDirectoryItem(plugin.handle, 
+					plugin.url_for_path( '/section/{0}/'.format(item['resource']) ),
+					xbmcgui.ListItem(item['title']), 
+					isFolder=True
+				)
 
 	renderItems(items)
 	
@@ -185,6 +194,15 @@ def renderItems(items):
 """
 @plugin.route('/action/<name>')
 def action(name):
+
+	if name == 'search':
+		keyboard = xbmc.Keyboard('', 'Zadejte název pořadu nebo jeho část:')
+		keyboard.doModal()
+		if (keyboard.isConfirmed()):
+			txt = keyboard.getText()
+			origin = plugin.args['origin'][0]
+			plugin.args['search'] = [txt]
+			section(origin) # cannot use redirect here beacuse of bug in routing module
 
 	if name == 'settings':
 		addon.openSettings()
