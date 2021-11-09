@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.iprima" version="1.4.0" name="iPrima.cz" provider-name="Roman Smolka">
+<addon id="plugin.video.iprima" version="1.4.1" name="iPrima.cz" provider-name="Roman Smolka">
 <requires>
 	<import addon="xbmc.python" version="3.0.0"/>
 	<import addon="script.module.routing" version="0.2.3"/>
@@ -16,5 +16,8 @@
 	<assets>
 		<icon>resources/icon.png</icon>
 	</assets>
+	<news>Oprava získání tokenu
+        </news>
 </extension>
 </addon>
+
