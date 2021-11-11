@@ -140,7 +140,7 @@ def login(email, password, device_id):
 		'client_id': 'prima_sso',
 		'grant_type': 'authorization_code',
 		'code': auth_code,
-		'redirect_uri': 'https://auth.iprima.cz/sso/auth_check.html'
+		'redirect_uri': 'https://auth.iprima.cz/sso/auth-check'
 	}, cookies=cookies)
 	helpers.log('Get token response: ' + get_token.text)
 
