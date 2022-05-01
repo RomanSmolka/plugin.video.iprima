@@ -6,6 +6,7 @@ import xbmcplugin
 import xbmcaddon
 import json
 import requests
+import inputstreamhelper
 import routing
 import sys
 
@@ -207,13 +208,31 @@ def action(name):
 		addon.openSettings()
 
 	if name == 'play':
+		PROTOCOL = 'mpd'
+		DRM = 'com.widevine.alpha'
 		videoId = plugin.args['videoId'][0]
 		videoDetail = helpers.requestResource('play', replace={'id': videoId})
-		try:
-			url = videoDetail['streamInfos'][0]['url']
-		except:
-			helpers.displayMessage('Nenalezen žádný stream pro video', 'ERROR')
-			return
-		li = xbmcgui.ListItem(path=url)
-
+		streamData = videoDetail['streamInfos'][0]
+		if not 'drmInfo' in streamData:
+			try:
+				url = streamData['url']
+			except:
+				helpers.displayMessage('Nenalezen žádný stream pro video', 'ERROR')
+				return
+			li = xbmcgui.ListItem(path=url)
+		else:
+			streamData = videoDetail['streamInfos'][1]
+			isHelper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
+			li = xbmcgui.ListItem()
+			if isHelper.check_inputstream():
+				li.setPath(streamData['url'])
+				drmInfo = streamData['drmInfo']
+				li.setContentLookup(False)
+				li.setMimeType('application/xml+dash')
+				li.setProperty('inputstreamaddon', 'inputstream.adaptive')
+				li.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+				if 'modularDrmInfos' in drmInfo:
+					drm = drmInfo['modularDrmInfos'][0]
+					li.setProperty('inputstream.adaptive.license_type', DRM)
+					li.setProperty('inputstream.adaptive.license_key', drm['licenseServerUrl'] + '|' + 'X-AxDRM-Message=' + drm['token'] + '|R{SSM}|')
 		xbmcplugin.setResolvedUrl(plugin.handle, True, li)
