@@ -9,5 +9,6 @@
 		<setting id="accessToken" type="text" label="Access token" default="" visible="false"/>
 		<setting id="deviceId" type="text" label="Device ID" default="" visible="false"/>
 		<setting id="userId" type="text" label="User ID" default="" visible="false"/>
+		<setting id="profileId" type="text" label="Profile ID" default="" visible="false"/>
 	</category>
 </settings>
