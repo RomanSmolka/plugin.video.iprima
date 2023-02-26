@@ -130,21 +130,20 @@ def login(email, password, device_id):
 	profile_id = xbmcplugin.getSetting(plugin.handle, 'profileId')
 	if not profile_id:
 		profile_id_search = re.search('data-edit-url="/user/profile-edit/(.*)"', do_login.text)
-		helpers.log('Selected profile id: {}'.format(profile_id_search[1]))
 
 		if profile_id_search:
-			profile_id = profile_id_search[1]
+			helpers.log('Selected profile id: {}'.format(profile_id_search.group(1)))
+			profile_id = profile_id_search.group(1)
 			addon.setSetting(id='profileId', value=profile_id)
 		else:
 			helpers.displayMessage('Nepodařilo se získat ID profilu', 'ERROR')
 			sys.exit(1)
 
+	cookies['prima_sso_profile'] = profile_id
+
 	do_profile_select = s.get(
 		'https://auth.iprima.cz/user/profile-select-perform/{}?continueUrl=/oauth2/authorize?response_type=code%26client_id=prima_sso%26redirect_uri=https://auth.iprima.cz/sso/auth-check%26scope=openid%20email%20profile%20phone%20address%20offline_access%26state=prima_sso%26auth_init_url=https://www.iprima.cz/%26auth_return_url=https://www.iprima.cz/?authentication%3Dcancelled'.format(profile_id),
-		cookies={
-			**cookies,
-			'prima_sso_profile': profile_id
-		})
+		cookies=cookies)
 	helpers.log('Profile select URL: {}'.format(do_profile_select.url))
 
 	# Acquire authorization code from profile select result
