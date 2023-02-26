@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.2] 2023-02-24
+
+### Opravy
+- Upraveno přihlášení s profilem podle nového provedení iPrima/Prima +
+
 ## [1.4.0] 2021-04-04
 
 ### Změny
