@@ -130,9 +130,9 @@ def login(email, password, device_id):
 	profile_id = xbmcplugin.getSetting(plugin.handle, 'profileId')
 	if not profile_id:
 		profile_id_search = re.search('data-edit-url="/user/profile-edit/(.*)"', do_login.text)
-		helpers.log('Selected profile id: {}'.format(profile_id_search[1]))
 
 		if profile_id_search:
+			helpers.log('Selected profile id: {}'.format(profile_id_search[1]))
 			profile_id = profile_id_search[1]
 			addon.setSetting(id='profileId', value=profile_id)
 		else:
