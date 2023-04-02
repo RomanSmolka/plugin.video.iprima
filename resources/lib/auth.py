@@ -126,8 +126,29 @@ def login(email, password, device_id):
 	}, cookies=cookies)
 	helpers.log('Auth check URL: ' + do_login.url)
 
-	# Acquire authorization code from login result
-	parsed_auth_url = urlparse(do_login.url)
+	# Optionally select profile
+	profile_id = xbmcplugin.getSetting(plugin.handle, 'profileId')
+	if not profile_id:
+		profile_id_search = re.search('data-edit-url="/user/profile-edit/(.*)"', do_login.text)
+
+		if profile_id_search:
+			helpers.log('Selected profile id: {}'.format(profile_id_search[1]))
+			profile_id = profile_id_search[1]
+			addon.setSetting(id='profileId', value=profile_id)
+		else:
+			helpers.displayMessage('Nepodařilo se získat ID profilu', 'ERROR')
+			sys.exit(1)
+
+	do_profile_select = s.get(
+		'https://auth.iprima.cz/user/profile-select-perform/{}?continueUrl=/oauth2/authorize?response_type=code%26client_id=prima_sso%26redirect_uri=https://auth.iprima.cz/sso/auth-check%26scope=openid%20email%20profile%20phone%20address%20offline_access%26state=prima_sso%26auth_init_url=https://www.iprima.cz/%26auth_return_url=https://www.iprima.cz/?authentication%3Dcancelled'.format(profile_id),
+		cookies={
+			**cookies,
+			'prima_sso_profile': profile_id
+		})
+	helpers.log('Profile select URL: {}'.format(do_profile_select.url))
+
+	# Acquire authorization code from profile select result
+	parsed_auth_url = urlparse(do_profile_select.url)
 	try:
 		auth_code = parse_qs(parsed_auth_url.query)['code'][0]
 	except KeyError:

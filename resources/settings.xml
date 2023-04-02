@@ -2,12 +2,13 @@
 <settings>
 	<category label="Obecné">
 		<setting id="pagination" type="enum" label="Položek na stránku" values="25|50|100|150" default="0"/>
-		<setting label="Účet iPrima" type="lsep"/>
+		<setting label="Účet Prima+" type="lsep"/>
 		<setting id="username" type="text" label="E-mail" default=""/>
 		<setting id="password" type="text" label="Heslo" option="hidden" default=""/>
 
 		<setting id="accessToken" type="text" label="Access token" default="" visible="false"/>
 		<setting id="deviceId" type="text" label="Device ID" default="" visible="false"/>
 		<setting id="userId" type="text" label="User ID" default="" visible="false"/>
+		<setting id="profileId" type="text" label="Profile ID" default="" visible="false"/>
 	</category>
 </settings>
