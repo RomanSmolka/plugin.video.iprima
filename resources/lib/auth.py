@@ -98,14 +98,11 @@ def getAccessToken(refresh=False, device=None):
 def login(email, password, device_id):
 	from . import helpers
 	s = requests.Session()
-
-	cookies = {
-		'prima_device_id': device_id,
-		'from_mobile_app': '1'
-	}
+	s.cookies.set('prima_device_id', device_id, domain='.iprima.cz')
+	s.cookies.set('from_mobile_app', '1', domain='.iprima.cz')
 
 	# Get login page
-	login_page = s.get('https://auth.iprima.cz/oauth2/login', cookies=cookies)
+	login_page = s.get('https://auth.iprima.cz/oauth2/login', verify=False)
 	login_page_content = login_page.text
 
 	# Acquire CSRF token
@@ -113,39 +110,34 @@ def login(email, password, device_id):
 	csrf_token = ''
 	if r_csrf:
 		csrf_token = r_csrf.group(1)
-		helpers.log('CSRF: ' + csrf_token)
 	else:
 		helpers.displayMessage('Nepodařilo se získat CSRF token', 'ERROR')
-		sys.exit(1)
+		return
 
 	# Log in
 	do_login = s.post('https://auth.iprima.cz/oauth2/login', {
 		'_email': email,
 		'_password': password,
 		'_csrf_token': csrf_token
-	}, cookies=cookies)
-	helpers.log('Auth check URL: ' + do_login.url)
+	}, verify=False)
 
-	# Optionally select profile
-	profile_id = xbmcplugin.getSetting(plugin.handle, 'profileId')
-	if not profile_id:
-		profile_id_search = re.search('data-edit-url="/user/profile-edit/(.*)"', do_login.text)
+	if do_login.status_code != 200:
+		helpers.displayMessage('Přihlášení selhalo. Zkontrolujte přihlašovací jmémo a heslo.', 'ERROR')
+		return
 
-		if profile_id_search:
-			helpers.log('Selected profile id: {}'.format(profile_id_search[1]))
-			profile_id = profile_id_search[1]
-			addon.setSetting(id='profileId', value=profile_id)
-		else:
-			helpers.displayMessage('Nepodařilo se získat ID profilu', 'ERROR')
-			sys.exit(1)
+	# select profile
+	do_login = s.get('https://auth.iprima.cz/user/profile-select', verify=False)
 
-	do_profile_select = s.get(
-		'https://auth.iprima.cz/user/profile-select-perform/{}?continueUrl=/oauth2/authorize?response_type=code%26client_id=prima_sso%26redirect_uri=https://auth.iprima.cz/sso/auth-check%26scope=openid%20email%20profile%20phone%20address%20offline_access%26state=prima_sso%26auth_init_url=https://www.iprima.cz/%26auth_return_url=https://www.iprima.cz/?authentication%3Dcancelled'.format(profile_id),
-		cookies={
-			**cookies,
-			'prima_sso_profile': profile_id
-		})
-	helpers.log('Profile select URL: {}'.format(do_profile_select.url))
+	# Search for profile id and set it
+	profile_id_search = re.search('data-edit-url="/user/profile-edit/(.*)"', do_login.text)
+
+	if profile_id_search:
+		profile_id = profile_id_search.group(1)
+	else:
+		helpers.displayMessage('Nepodařilo se získat ID profilu', 'ERROR')
+		return
+
+	do_profile_select = s.get('https://auth.iprima.cz/user/profile-select-perform/{}?continueUrl=/oauth2/authorize?response_type=code%26client_id=prima_sso%26redirect_uri=https://auth.iprima.cz/sso/auth-check%26scope=openid%20email%20profile%20phone%20address%20offline_access%26state=prima_sso%26auth_init_url=https://www.iprima.cz/%26auth_return_url=https://www.iprima.cz/?authentication%3Dcancelled'.format(profile_id), verify=False)
 
 	# Acquire authorization code from profile select result
 	parsed_auth_url = urlparse(do_profile_select.url)
@@ -153,7 +145,7 @@ def login(email, password, device_id):
 		auth_code = parse_qs(parsed_auth_url.query)['code'][0]
 	except KeyError:
 		helpers.displayMessage('Nepodařilo se získat autorizační kód, zkontrolujte přihlašovací údaje', 'ERROR')
-		sys.exit(1)
+		return
 
 	# Get access token
 	get_token = s.post('https://auth.iprima.cz/oauth2/token', {
@@ -162,11 +154,9 @@ def login(email, password, device_id):
 		'grant_type': 'authorization_code',
 		'code': auth_code,
 		'redirect_uri': 'https://auth.iprima.cz/sso/auth-check'
-	}, cookies=cookies)
-	helpers.log('Get token response: ' + get_token.text)
-
+	}, verify=False)
 	if get_token.ok:
 		return get_token.json()
 	else:
 		helpers.displayMessage('Nepodařilo se získat access token', 'ERROR')
-		sys.exit(1)
+		return
