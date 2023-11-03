@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.5] 2023-07-11
+
+### Opravy
+- Oprava přihlašování / autorizace
+
 ## [1.4.4] 2023-02-27
 
 ### Změny
