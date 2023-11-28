@@ -112,6 +112,7 @@ def program(nid):
 			url = plugin.url_for_path( '/sublisting/{0}/bonus/'.format(nid) )
 			xbmcplugin.addDirectoryItem(plugin.handle, url, li, isFolder=True)
 
+	xbmcplugin.setContent(plugin.handle, "episodes")
 	renderItems(programDetail['episodes'])
 
 	if len(programDetail['episodes']) == lookups.shared['pagination']:
